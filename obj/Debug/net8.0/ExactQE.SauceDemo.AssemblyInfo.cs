@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ExactQE.SauceDemo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+17f415cd6071a373b76d0418dbe7e03001ddeeec")]
 [assembly: System.Reflection.AssemblyProductAttribute("ExactQE.SauceDemo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ExactQE.SauceDemo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

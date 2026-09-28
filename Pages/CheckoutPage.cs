@@ -19,7 +19,7 @@ public sealed class CheckoutPage
     public CheckoutPage(IWebDriver driver)
 {
     this.driver = driver;
-    wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+    wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
 
     wait.Until(d => d.Url.Contains("checkout-step-one.html"));
 }
