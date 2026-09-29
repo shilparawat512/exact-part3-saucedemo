@@ -1,102 +1,183 @@
-# Exact Online QE Assessment – Part 3
+# Exact Online QE Technical Assessment – Part 3
 
-## Scope
+## Overview
 
-This solution implements Part 3 of the Exact Online Quality Engineer assessment using:
+This project contains a UI automation solution for the SauceDemo application, created as part of the Exact Online Quality Engineer Technical Assessment.
 
-- C#
-- .NET 8
-- Selenium WebDriver
-- NUnit
-- Page Object Model
+The solution demonstrates:
 
-The test application is SauceDemo.
+- UI automation using Selenium WebDriver
+- C# with .NET 8
+- NUnit as the test framework
+- Page Object Model for maintainable test design
+- Explicit waits for stable synchronization
+- Positive and negative login validation
+- Product selection and cart validation
+- Checkout flow validation
+- Screenshot capture after every test
+- Headless test execution
+- GitHub Actions CI execution
+- Screenshot artifacts from CI runs
 
-## Covered flows
+The implementation focuses on readable, maintainable automation without unnecessary abstraction.
+
+## Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| C# | Programming language |
+| .NET 8 | Runtime and project framework |
+| Selenium WebDriver | Browser automation |
+| NUnit | Test framework |
+| NUnit3TestAdapter | NUnit integration with `dotnet test` |
+| Selenium.Support | Selenium support utilities such as explicit waits |
+| Google Chrome | Browser used for UI tests |
+| Git | Source control |
+| GitHub Actions | Continuous integration |
+
+## Application Under Test
+
+The tests use the SauceDemo application:
+
+    https://www.saucedemo.com/
+
+The automation covers:
 
 1. Successful login
 2. Invalid login
-3. Add multiple products to the cart and verify cart contents
-4. Complete checkout and verify the order confirmation
+3. Adding product(s) to the cart
+4. Completing checkout
+5. Verifying successful order completion
 
-## Project structure
+## Project Structure
 
-```text
-ExactQE.SauceDemo/
-├── Pages/
-│   ├── LoginPage.cs
-│   ├── InventoryPage.cs
-│   ├── CartPage.cs
-│   └── CheckoutPage.cs
-├── Tests/
-│   └── SauceDemoTests.cs
-├── .github/
-│   └── workflows/
-│       └── ci.yml
-├── ExactQE.SauceDemo.csproj
-└── README.md
-```
+    ExactQE-SauceDemo/
+    │
+    ├── .github/
+    │   └── workflows/
+    │       └── ci.yml
+    │
+    ├── Pages/
+    │   ├── LoginPage.cs
+    │   ├── InventoryPage.cs
+    │   ├── CartPage.cs
+    │   └── CheckoutPage.cs
+    │
+    ├── Tests/
+    │   └── SauceDemoTests.cs
+    │
+    ├── .gitignore
+    ├── ExactQE.SauceDemo.csproj
+    ├── README.md
+    └── USER_MANUAL.md
 
-## Prerequisites
+Generated files such as `bin/`, `obj/`, and `TestResults/` are excluded from source control.
 
-- .NET 8 SDK
-- Google Chrome
-- Internet access
+## Page Objects
 
-Selenium Manager is used by Selenium WebDriver to manage the browser driver, so a separate ChromeDriver executable is not required for the normal local run.
+### LoginPage
 
-## Run locally
+Responsible for interactions with the login screen, including entering credentials, submitting login, and exposing login error information.
 
-From the project directory:
+### InventoryPage
 
-```bash
-dotnet restore
-dotnet test
-```
+Responsible for interactions with the product inventory, including adding products to the cart and navigating to the cart.
 
-The tests run headlessly by default.
+### CartPage
 
-## How to run a specific test
+Responsible for cart-page interactions, including verifying selected products and starting checkout.
 
-dotnet test --filter "FullyQualifiedName~ValidLogin_ShouldOpenProductsPage"
+### CheckoutPage
 
-## Design decisions
+Responsible for entering customer details, continuing through checkout, completing the order, and exposing the completion message or checkout error.
+
+## Framework Design
 
 ### Page Object Model
 
-Page-specific locators and interactions are kept in page classes. Tests contain the business flow and assertions.
+Page-specific locators and actions are kept inside Page Objects rather than directly inside test methods. This keeps tests focused on business scenarios and makes UI changes easier to maintain.
 
-### Stable selectors
+### Synchronization
 
-The solution uses IDs and `data-test` attributes where available rather than brittle XPath expressions.
+The framework uses Selenium explicit waits rather than fixed `Thread.Sleep` delays. Important page transitions and elements are waited for before the next action.
 
-### Synchronisation
+### Element Selection
 
-Explicit waits are used for elements that require the page to be ready before interaction or assertion.
+Stable selectors such as `id` and `data-test` attributes are preferred where available. This reduces dependence on visual layout or DOM structure.
 
 ### Assertions
 
-Assertions verify meaningful user outcomes:
+Assertions validate meaningful application outcomes, including successful navigation, login errors, products in the cart, and checkout completion.
 
-- successful login reaches the Products page
-- invalid login displays an authentication error
-- adding products updates the cart and the expected products appear
-- checkout ends with the order confirmation
+### Test Data
 
-### Reuse
+The current tests use the fixed test data required by SauceDemo. Additional test-data infrastructure has not been introduced because it is unnecessary for the scope of this assessment.
 
-Common login and browser setup are reused without introducing unnecessary framework abstraction.
+### Limited Abstraction
 
-### Failure information
+The project intentionally avoids excessive framework layers. The goal is a small, readable and maintainable automation solution appropriate for the assessment.
 
-Assertions include descriptive messages so a failure gives context about the expected business outcome.
+## Screenshots
 
-## CI
+A screenshot is captured after every test execution.
 
-A GitHub Actions workflow is included to restore, build and run the NUnit tests on every push and pull request.
+Local screenshots are stored in:
 
-### Test Diagnostics
+    TestResults/Screenshots/
 
-Screenshots are captured after each test and stored as test artifacts.
-Screenshots from the previous test run are removed at the start of a new
-test run to avoid accumulating outdated artifacts.
+The screenshot directory is cleaned before a new test run so screenshots from previous executions do not accumulate.
+
+Screenshots are also registered as NUnit test attachments.
+
+## GitHub Actions
+
+The repository contains:
+
+    .github/workflows/ci.yml
+
+The workflow runs on pushes and pull requests.
+
+It:
+
+1. Checks out the repository.
+2. Sets up .NET 8.
+3. Restores dependencies.
+4. Runs the NUnit tests.
+5. Uploads screenshots even if tests fail.
+
+The CI screenshot artifact is named:
+
+    test-screenshots
+
+See `USER_MANUAL.md` for complete setup, execution and CI instructions.
+
+## Generated Files and .gitignore
+
+Generated development and test files are excluded using `.gitignore`, including:
+
+    bin/
+    obj/
+    TestResults/
+    Screenshots/
+    .vs/
+    .vscode/
+    .idea/
+    .DS_Store
+
+## Quick Start
+
+From the project root:
+
+    dotnet restore
+    dotnet build
+    dotnet test
+
+For headless execution:
+
+    HEADLESS=true dotnet test
+
+For an individual test:
+
+    dotnet test --filter "FullyQualifiedName~ValidLogin_ShouldOpenProductsPage"
+
+For complete setup instructions, see `USER_MANUAL.md`.
