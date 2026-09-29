@@ -95,3 +95,8 @@ Assertions include descriptive messages so a failure gives context about the exp
 
 A GitHub Actions workflow is included to restore, build and run the NUnit tests on every push and pull request.
 
+### Test Diagnostics
+
+Screenshots are captured after each test and stored as test artifacts.
+Screenshots from the previous test run are removed at the start of a new
+test run to avoid accumulating outdated artifacts.

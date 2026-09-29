@@ -25,11 +25,44 @@ public class SauceDemoTests
     }
 
     [TearDown]
-    public void TearDown()
+public void TearDown()
+{
+    var testName = TestContext.CurrentContext.Test.Name;
+
+    var screenshotsDirectory = Path.Combine(
+    Directory.GetCurrentDirectory(),
+    "TestResults",
+    "Screenshots");
+
+    Directory.CreateDirectory(screenshotsDirectory);
+
+    var fileName = $"{testName}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
+    var filePath = Path.Combine(screenshotsDirectory, fileName);
+
+    var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+    screenshot.SaveAsFile(filePath);
+
+    TestContext.AddTestAttachment(filePath);
+
+    driver.Quit();
+    driver.Dispose();
+}
+
+[OneTimeSetUp]
+public void CleanScreenshots()
+{
+    var screenshotsDirectory = Path.Combine(
+    Directory.GetCurrentDirectory(),
+    "TestResults",
+    "Screenshots");
+
+    if (Directory.Exists(screenshotsDirectory))
     {
-        driver.Quit();
-       driver.Dispose();
+        Directory.Delete(screenshotsDirectory, true);
     }
+
+    Directory.CreateDirectory(screenshotsDirectory);
+}
 
     [Test]
     public void ValidLogin_ShouldOpenProductsPage()
