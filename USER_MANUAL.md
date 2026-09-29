@@ -1,224 +1,189 @@
 # Exact Online QE Technical Assessment – Part 3
 
-## Overview
+# User Manual
 
-This project contains a UI automation solution for the SauceDemo application, created as part of the Exact Online Quality Engineer Technical Assessment.
+## 1. Purpose
 
-The solution demonstrates maintainable UI automation using Selenium WebDriver, NUnit and C#.
+This manual explains how to install the prerequisites, obtain the project, run the tests and access test results.
 
-The implementation focuses on:
+## 2. Prerequisites
 
-- Maintainable test structure
-- Page Object Model
-- Stable element selection
-- Explicit synchronization
-- Meaningful assertions
-- Test diagnostics through screenshots
-- CI execution with GitHub Actions
+The following software is required:
 
-## Technology Stack
+- Git
+- .NET 8 SDK
+- Google Chrome
 
-| Technology | Purpose |
-|---|---|
-| C# | Programming language |
-| .NET 8 | Application framework |
-| Selenium WebDriver | Browser automation |
-| NUnit | Test framework |
-| NUnit3TestAdapter | NUnit integration with `dotnet test` |
-| Selenium.Support | Selenium wait and support functionality |
-| Google Chrome | Browser |
-| Git | Source control |
-| GitHub Actions | CI |
+A separate ChromeDriver installation is not required because Selenium Manager handles browser-driver management.
 
-## Project Structure
+## 3. Setup
 
-    ExactQE-SauceDemo/
-    │
-    ├── .github/
-    │   └── workflows/
-    │       └── ci.yml
-    │
-    ├── Pages/
-    │   ├── LoginPage.cs
-    │   ├── InventoryPage.cs
-    │   ├── CartPage.cs
-    │   └── CheckoutPage.cs
-    │
-    ├── Tests/
-    │   └── SauceDemoTests.cs
-    │
-    ├── .gitignore
-    ├── ExactQE.SauceDemo.csproj
-    ├── README.md
-    └── USER_MANUAL.md
+### 3.1 Install Git
 
-Generated files such as `bin/`, `obj/` and `TestResults/` are excluded from source control.
+#### macOS
 
-## Test Coverage
+If Homebrew is installed:
 
-The automated suite covers four scenarios:
+    brew install git
 
-1. Successful login
-2. Invalid login
-3. Adding two products to the cart
-4. Completing checkout and verifying the order confirmation
+Verify:
 
-The tests cover both positive and negative application behaviour.
+    git --version
 
-## Page Object Model
+#### Windows
 
-The project uses the Page Object Model to separate page-specific interaction from test scenarios.
+Install Git from:
 
-### LoginPage
+    https://git-scm.com/
 
-Responsible for:
+Then verify:
 
-- Opening the application
-- Entering username and password
-- Submitting the login form
-- Reading the login error
+    git --version
 
-### InventoryPage
+### 3.2 Install .NET 8
 
-Responsible for:
+Install the .NET 8 SDK.
 
-- Reading the inventory page title
-- Adding products
-- Reading the cart count
-- Opening the cart
+On macOS with Homebrew:
 
-### CartPage
+    brew install --cask dotnet-sdk
 
-Responsible for:
+Verify:
 
-- Synchronizing with the cart page
-- Checking whether products are present
-- Starting checkout
+    dotnet --version
 
-### CheckoutPage
+An 8.x SDK should be available.
 
-Responsible for:
+### 3.3 Install Google Chrome
 
-- Entering customer details
-- Continuing checkout
-- Finishing the order
-- Reading the completion message
-- Reading checkout errors
+Install Google Chrome from:
 
-## Framework Design Decisions
+    https://www.google.com/chrome/
 
-### Page Object Model
+## 4. Get the Project
 
-Page-specific locators and actions are kept inside Page Objects rather than directly in the tests.
+Clone the repository:
 
-This keeps the test methods focused on user behaviour and makes page changes easier to maintain.
+    git clone https://github.com/shilparawat512/exact-part3-saucedemo.git
 
-### Synchronization
+Enter the project directory:
 
-The automation uses Selenium explicit waits for important page transitions and elements.
+    cd exact-part3-saucedemo
 
-Fixed delays such as `Thread.Sleep` are not used.
+Restore the project dependencies:
 
-The waits synchronize the test with the application state rather than waiting for an arbitrary amount of time.
+    dotnet restore
 
-### Element Selection
+Build the project:
 
-The implementation prefers stable selectors such as:
+    dotnet build
 
-- Element IDs
-- `data-test` attributes
+## 5. Run the Tests
 
-Examples:
+### Run All Tests
 
-    By.Id("checkout")
+Run:
 
-    By.CssSelector("[data-test='complete-header']")
+    dotnet test
 
-This reduces dependency on CSS styling or DOM position.
+The current test setup runs Chrome in headless mode by default.
 
-### Assertions
+The browser is configured with:
 
-Assertions validate meaningful application outcomes rather than simply checking that a Selenium action completed.
+    --headless=new
 
-Examples include:
+The browser viewport is configured as:
 
-- Successful login opens the Products page.
-- Invalid login displays the expected error.
-- The expected products are present in the cart.
-- The cart count is correct.
-- Successful checkout displays the order confirmation.
+    --window-size=1920,1080
 
-### Test Data
+Therefore, no Chrome window is displayed during normal test execution.
 
-The test suite uses the fixed data required by the SauceDemo scenarios.
+### Run an Individual Test
 
-No additional test-data framework was introduced because it would add unnecessary complexity for the scope of this assessment.
+For example:
 
-### Limited Abstraction
+    dotnet test --filter "FullyQualifiedName~ValidLogin_ShouldOpenProductsPage"
 
-The framework intentionally remains lightweight.
+Replace the test name with the test you want to execute.
 
-Additional abstraction layers or custom framework components were avoided where they would not provide meaningful value for this application.
-
-## Test Diagnostics
+## 6. Test Results and Screenshots
 
 A screenshot is captured after every test execution.
 
-Screenshots are registered as NUnit test attachments and are also written to the test-results directory.
+Screenshots are stored locally in:
 
-The screenshot implementation provides visual evidence of the browser state for both successful and failed tests.
+    TestResults/Screenshots/
 
-The screenshot directory is cleaned before a new test run to prevent old screenshots from accumulating.
+The screenshot filename contains the test name and execution timestamp.
 
-## CI Design
+The screenshot directory is cleared at the beginning of a new test run, so screenshots from previous runs are removed.
 
-The project contains a GitHub Actions workflow under:
+## 7. GitHub Actions
 
-    .github/workflows/ci.yml
+The project includes a GitHub Actions workflow.
 
-The workflow is triggered by:
+To view a CI run:
 
-- Push
-- Pull request
+1. Open the GitHub repository.
+2. Select **Actions**.
+3. Select the required workflow run.
+4. Open the run to view the test results.
 
-The CI pipeline:
+The CI test command is:
 
-1. Checks out the repository.
-2. Sets up .NET 8.
-3. Restores dependencies.
-4. Executes the automated tests.
-5. Uploads generated screenshots as an artifact.
+    dotnet test --no-restore --logger "trx;LogFileName=test-results.trx"
 
-The screenshot artifact is named:
+## 8. Download CI Screenshots
+
+Screenshots produced by GitHub Actions are uploaded as an artifact named:
 
     test-screenshots
 
-The upload step uses `always()` so screenshots remain available when the test execution fails.
+To download them:
 
-## Source Control
+1. Open the repository on GitHub.
+2. Select **Actions**.
+3. Open the relevant workflow run.
+4. Scroll to the **Artifacts** section.
+5. Select **test-screenshots**.
+6. Download the artifact.
+7. Extract the downloaded archive.
+8. Open the screenshot files.
 
-The `.gitignore` excludes generated and local development files, including:
+The screenshot upload is configured to run even when the test step fails.
 
-    bin/
-    obj/
-    TestResults/
-    Screenshots/
-    .vs/
-    .vscode/
-    .idea/
-    .DS_Store
+## 9. Troubleshooting
 
-## Design Summary
+### Build fails
 
-The solution deliberately uses a simple structure appropriate for the size and scope of the assessment:
+Check the installed .NET SDK:
 
-- NUnit for test execution
-- Selenium WebDriver for browser automation
-- Page Objects for maintainability
-- Explicit waits for synchronization
-- Stable selectors for UI interaction
-- NUnit assertions for behaviour validation
-- Screenshots for diagnostics
-- GitHub Actions for CI execution
+    dotnet --version
 
-For installation and execution instructions, see `USER_MANUAL.md`.
+The project requires .NET 8.
+
+### Tests fail
+
+Run the tests again and review the test output:
+
+    dotnet test
+
+Then check the corresponding screenshot under:
+
+    TestResults/Screenshots/
+
+For a CI failure, review the GitHub Actions test output and download the `test-screenshots` artifact.
+
+## 10. Quick Reference
+
+| Task | Command / Location |
+|---|---|
+| Clone repository | `git clone https://github.com/shilparawat512/exact-part3-saucedemo.git` |
+| Enter project | `cd exact-part3-saucedemo` |
+| Restore | `dotnet restore` |
+| Build | `dotnet build` |
+| Run all tests | `dotnet test` |
+| Run one test | `dotnet test --filter "FullyQualifiedName~TestName"` |
+| Local screenshots | `TestResults/Screenshots/` |
+| CI | GitHub Actions |
+| CI screenshot artifact | `test-screenshots` |
