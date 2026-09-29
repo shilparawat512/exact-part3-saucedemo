@@ -24,28 +24,33 @@ public class SauceDemoTests
         driver = new ChromeDriver(options);
     }
 
-    [TearDown]
+[TearDown]
 public void TearDown()
 {
-    var testName = TestContext.CurrentContext.Test.Name;
+    try
+    {
+        if (driver is ITakesScreenshot screenshotDriver)
+        {
+            var directory = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "TestResults",
+                "Screenshots");
 
-    var screenshotsDirectory = Path.Combine(
-    Directory.GetCurrentDirectory(),
-    "TestResults",
-    "Screenshots");
+            Directory.CreateDirectory(directory);
 
-    Directory.CreateDirectory(screenshotsDirectory);
+            var path = Path.Combine(
+                directory,
+                $"{TestContext.CurrentContext.Test.Name}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
 
-    var fileName = $"{testName}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-    var filePath = Path.Combine(screenshotsDirectory, fileName);
-
-    var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
-    screenshot.SaveAsFile(filePath);
-
-    TestContext.AddTestAttachment(filePath);
-
-    driver.Quit();
-    driver.Dispose();
+            screenshotDriver.GetScreenshot().SaveAsFile(path);
+            TestContext.AddTestAttachment(path);
+        }
+    }
+    finally
+    {
+        driver?.Quit();
+        driver?.Dispose();
+    }
 }
 
 [OneTimeSetUp]
