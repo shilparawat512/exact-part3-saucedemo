@@ -11,29 +11,23 @@ public sealed class CartPage
     private readonly By CheckoutButton = By.Id("checkout");
     private readonly By BackpackItem = By.Id("item_4_title_link");
     private readonly By BikeLightItem = By.Id("item_0_title_link");
-    private readonly By FirstNameField = By.Id("first-name");
 
     public CartPage(IWebDriver driver)
     {
         this.driver = driver;
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-
-        wait.Until(d => d.Url.Contains("cart.html"));
+        wait.Until(d => d.FindElement(CheckoutButton));
     }
 
-    public bool HasBackpack =>
-        driver.FindElements(BackpackItem).Count > 0;
+    public bool HasBackpack => driver.FindElements(BackpackItem).Count > 0;
 
-    public bool HasBikeLight =>
-        driver.FindElements(BikeLightItem).Count > 0;
+    public bool HasBikeLight => driver.FindElements(BikeLightItem).Count > 0;
 
     public void Checkout()
     {
         wait.Until(d => d.FindElement(CheckoutButton)).Click();
 
-        // Wait for the checkout form to be available
-        // instead of relying only on URL navigation.
-        wait.Until(d => d.FindElement(FirstNameField));
+        wait.Until(d => d.FindElement(By.Id("first-name")));
     }
 }
