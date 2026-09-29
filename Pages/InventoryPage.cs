@@ -31,6 +31,9 @@ public sealed class InventoryPage
     public string CartCount =>
         wait.Until(d => d.FindElement(CartBadge)).Text;
 
-    public void OpenCart() =>
-        wait.Until(d => d.FindElement(CartLink)).Click();
+    public void OpenCart()
+{
+    wait.Until(d => d.FindElement(CartLink)).Click();
+    wait.Until(d => d.Url.Contains("cart.html"));
+}
 }

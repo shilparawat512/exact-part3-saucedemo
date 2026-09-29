@@ -13,12 +13,12 @@ public sealed class CartPage
     private readonly By BikeLightItem = By.Id("item_0_title_link");
 
     public CartPage(IWebDriver driver)
-    {
-        this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+{
+    this.driver = driver;
+    wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
-        wait.Until(d => d.FindElement(CheckoutButton));
-    }
+    wait.Until(d => d.Url.Contains("cart.html"));
+}
 
     public bool HasBackpack => driver.FindElements(BackpackItem).Count > 0;
 
